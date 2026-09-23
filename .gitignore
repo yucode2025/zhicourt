@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+playwright-report/
+*.local
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# DB / runtime
+*.sqlite3
+*.db
+*.log
+logs/
+data/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# 加密密钥文件（自动生成，严禁提交）
+.secret_key
+
+# 本地测试产物 / 会话工作区（不提交）
+artifacts/
+.zcode/
+backend/.pytest_tmp/
+
+# 测试运行产物与截图（不提交）
+test-results/
+gui-test-screenshots/
+.pytest-tmp/
+
+# 本机 Agent / 部署工具缓存与临时凭据说明（不属于应用源码）
+.codex/
+.agents/skills/BT-*/
+.agents/skills/_bt_skills.zip
+pT6bfDMd7CEU.md
+
+# Local backups and release staging (never publish)
+backups/
+tmp/
+staging/
