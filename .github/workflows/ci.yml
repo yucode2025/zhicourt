@@ -110,7 +110,8 @@ jobs:
           engine.dispose()
           found = [(operation, getattr(subject, "name", None)) for operation, subject in diffs]
           expected = [
-              ("remove_constraint", "uq_anonymous_sessions_user_id"),
+              # MariaDB reflects this existing UNIQUE constraint as a unique index.
+              ("remove_index", "uq_anonymous_sessions_user_id"),
               ("remove_index", "ix_anonymous_sessions_user_id"),
               ("add_index", "ix_anonymous_sessions_user_id"),
               ("remove_index", "ix_verdicts_case_id"),
@@ -219,7 +220,10 @@ jobs:
           printf 'APP_ENV=prod\nALLOW_INSECURE_HTTP=false\nPUBLIC_ORIGIN=https://court.example.com\nCORS_ORIGINS=https://court.example.com\nTRUSTED_HOSTS=court.example.com\n' > /tmp/zhicourt-ci.env
           python deploy/render.py nginx --app-dir /opt/zhicourt --app-user zhicourt --env-file /tmp/zhicourt-ci.env --mode https --output /tmp/zhicourt-site
           python deploy/render.py service --app-dir /opt/zhicourt --app-user zhicourt --env-file /tmp/zhicourt-ci.env --output /tmp/zhicourt.service
-          ! grep -Eq '__[A-Z_]+__' /tmp/zhicourt-site /tmp/zhicourt.service
+          if grep -Eq '__[A-Z_]+__' /tmp/zhicourt-site /tmp/zhicourt.service; then
+            echo 'Unrendered deployment placeholder found' >&2
+            exit 1
+          fi
           grep -q 'EnvironmentFile="/tmp/zhicourt-ci.env"' /tmp/zhicourt.service
           grep -q 'WorkingDirectory="/opt/zhicourt/current/backend"' /tmp/zhicourt.service
           grep -q 'ExecStart="/opt/zhicourt/current/backend/.venv/bin/uvicorn"' /tmp/zhicourt.service
@@ -231,8 +235,11 @@ jobs:
           grep -q 'Permissions-Policy' /tmp/zhicourt-site
           grep -q 'listen 80 default_server' /tmp/zhicourt-site
           grep -q 'listen 443 ssl default_server' /tmp/zhicourt-site
-          grep -q 'return 308 https://court.example.com$request_uri' /tmp/zhicourt-site
-          ! grep -q 'https://$host' /tmp/zhicourt-site
+          grep -Fq "return 308 https://court.example.com\$request_uri" /tmp/zhicourt-site
+          if grep -Fq "https://\$host" /tmp/zhicourt-site; then
+            echo 'Unsafe dynamic redirect host found' >&2
+            exit 1
+          fi
           grep -q 'proxy_set_header Host court.example.com;' /tmp/zhicourt-site
           grep -q 'location = /api/docs { return 404; }' /tmp/zhicourt-site
           grep -q 'location = /api/openapi.json { return 404; }' /tmp/zhicourt-site
@@ -250,8 +257,14 @@ jobs:
           PY
           cp /tmp/zhicourt-ci.env /tmp/zhicourt-bad-host.env
           sed -i 's/TRUSTED_HOSTS=court.example.com/TRUSTED_HOSTS=other.example.com/' /tmp/zhicourt-bad-host.env
-          ! python deploy/render.py nginx --app-dir /opt/zhicourt --app-user zhicourt --env-file /tmp/zhicourt-bad-host.env --mode https --output /tmp/should-not-render
-          ! python deploy/render.py nginx --app-dir 'C:\\prod\\zhicourt' --app-user zhicourt --env-file /tmp/zhicourt-ci.env --mode https --output /tmp/should-not-render
+          if python deploy/render.py nginx --app-dir /opt/zhicourt --app-user zhicourt --env-file /tmp/zhicourt-bad-host.env --mode https --output /tmp/should-not-render; then
+            echo 'Renderer accepted mismatched trusted host' >&2
+            exit 1
+          fi
+          if python deploy/render.py nginx --app-dir 'C:\\prod\\zhicourt' --app-user zhicourt --env-file /tmp/zhicourt-ci.env --mode https --output /tmp/should-not-render; then
+            echo 'Renderer accepted a Windows application path' >&2
+            exit 1
+          fi
           cp /tmp/zhicourt-ci.env /tmp/zhicourt-preflight.env
           printf 'DB_HOST=127.0.0.1\nDB_PORT=3306\nDB_USER=zhicourt\nDB_PASSWORD=ci_password\nDB_NAME=zhicourt\nSECRET_ENCRYPTION_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\n' >> /tmp/zhicourt-preflight.env
           test "$(python deploy/render.py --preflight --env-file /tmp/zhicourt-preflight.env --backend-dir backend)" = $'https\nzhicourt'
