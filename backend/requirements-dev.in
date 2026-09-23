@@ -1,0 +1,12 @@
+# Development and CI dependencies. Runtime dependencies are included in the
+# development lock through this input reference.
+-r requirements.in
+
+# Starlette's TestClient uses the next-generation HTTPX package when present;
+# retaining httpx above is necessary for application outbound HTTP calls.
+httpx2>=2,<3
+mypy>=1.15,<2
+pytest>=8,<10
+pytest-asyncio>=0.23,<2
+pytest-cov>=6,<8
+ruff>=0.12,<1

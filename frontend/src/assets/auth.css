@@ -1,0 +1,86 @@
+/* 认证页共用样式（Login/Register） */
+.auth-page {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 56px;
+}
+.auth-card {
+  width: 420px;
+  max-width: 100%;
+  padding: 36px 38px 28px;
+}
+.auth-head {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.logo-big {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--c-primary), #3f8ef7);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.auth-head h1 {
+  font-size: 22px;
+}
+.auth-head p {
+  color: var(--c-ink-3);
+  font-size: 13.5px;
+  margin: 6px 0 0;
+}
+.auth-error {
+  background: var(--c-pro-bg);
+  border: 1px solid var(--c-pro-line);
+  color: var(--c-pro);
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+.field {
+  display: block;
+  margin-bottom: 14px;
+}
+.field span {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-ink-2);
+  margin-bottom: 6px;
+}
+.auth-foot {
+  text-align: center;
+  font-size: 13px;
+  color: var(--c-ink-3);
+  margin: 16px 0 0;
+}
+.auth-foot .sep {
+  margin: 0 8px;
+}
+.hint-text {
+  font-size: 12px;
+  color: var(--c-ink-3);
+  margin-top: 6px;
+}
+.zhihu-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+  color: var(--c-ink-3);
+  font-size: 12px;
+}
+.zhihu-divider::before,
+.zhihu-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--c-border, #e5e5e5);
+}

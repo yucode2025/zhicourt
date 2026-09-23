@@ -1,0 +1,13 @@
+import { afterEach, vi } from 'vitest'
+import { config } from '@vue/test-utils'
+
+config.global.stubs = {
+  transition: false,
+  'transition-group': false,
+}
+
+afterEach(() => {
+  document.body.innerHTML = ''
+  vi.restoreAllMocks()
+  vi.unstubAllGlobals()
+})

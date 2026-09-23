@@ -1,0 +1,30 @@
+# Render exclusively with deploy/render.py
+[Unit]
+Description=ZhiCourt Knowledge Court API (FastAPI)
+After=network-online.target mariadb.service redis-server.service
+Wants=network-online.target mariadb.service redis-server.service
+
+[Service]
+Type=simple
+User=__APP_USER__
+Group=__APP_USER__
+WorkingDirectory="__APP_DIR__/current/backend"
+EnvironmentFile="__ENV_FILE__"
+ExecStart="__APP_DIR__/current/backend/.venv/bin/uvicorn" app.main:app --host 127.0.0.1 --port 8000 --workers 1 --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=always
+RestartSec=3
+TimeoutStopSec=30
+MemoryMax=1G
+MemoryHigh=800M
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=zhicourt
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/zhicourt
+UMask=0027
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,2 @@
+# Backward-compatible runtime install entry point used by deployment scripts.
+-r requirements.lock
